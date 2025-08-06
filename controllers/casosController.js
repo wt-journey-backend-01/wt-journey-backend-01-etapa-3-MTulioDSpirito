@@ -36,7 +36,7 @@ module.exports = {
 
   async createCaso(req, res) {
     const { error, value } = casoSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.message });
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
     const agente = await agentesRepository.findById(value.agente_id);
     if (!agente) return res.status(404).json({ message: 'Agente atribuído não encontrado.' });
@@ -45,10 +45,22 @@ module.exports = {
     res.status(201).json(novoCaso);
   },
 
+  // Novo método para PUT (atualização completa)
+  async putCaso(req, res) {
+    const { id } = req.params;
+    const { error, value } = casoSchema.validate(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const updated = await casosRepository.update(id, value);
+    if (!updated) return res.status(404).json({ message: 'Caso não encontrado.' });
+
+    res.json(updated);
+  },
+
   async patchCaso(req, res) {
     const { id } = req.params;
     const { error, value } = patchSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.message });
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
     const updated = await casosRepository.update(id, value);
     if (!updated) return res.status(404).json({ message: 'Caso não encontrado.' });

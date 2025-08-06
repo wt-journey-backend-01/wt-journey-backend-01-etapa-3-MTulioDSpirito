@@ -39,16 +39,28 @@ module.exports = {
 
   async createAgente(req, res) {
     const { error, value } = agenteSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.message });
+    if (error) return res.status(400).json({ message: error.details[0].message }); // Mensagem de erro mais específica
 
     const novoAgente = await agentesRepository.create(value);
     res.status(201).json(novoAgente);
   },
 
+  // Novo método para PUT (atualização completa)
+  async putAgente(req, res) {
+    const { id } = req.params;
+    const { error, value } = agenteSchema.validate(req.body); // Validação de todos os campos
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    const updated = await agentesRepository.update(id, value);
+    if (!updated) return res.status(404).json({ message: 'Agente não encontrado.' });
+
+    res.json(updated);
+  },
+
   async patchAgente(req, res) {
     const { id } = req.params;
     const { error, value } = patchSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.message });
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
     const updated = await agentesRepository.update(id, value);
     if (!updated) return res.status(404).json({ message: 'Agente não encontrado.' });

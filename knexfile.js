@@ -17,4 +17,20 @@ module.exports = {
       directory: './db/seeds',
     },
   },
+  ci: { // Adicionando a configuração para CI, conforme mencionado no README.md
+    client: 'pg',
+    connection: {
+      host: 'postgres',
+      port: 5432,
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+    },
+    migrations: {
+      directory: './db/migrations',
+    },
+    seeds: {
+      directory: './db/seeds',
+    },
+  },
 };

@@ -25,12 +25,7 @@ module.exports = {
   async findById(id) {
     try {
       const caso = await db('casos').where({ id }).first();
-      if (!caso) {
-        const error = new Error('Caso não encontrado');
-        error.status = 404;
-        throw error;
-      }
-      return caso;
+      return caso; // Removido o throw para deixar o controller lidar com o 404
     } catch (err) {
       throw err;
     }
@@ -48,12 +43,7 @@ module.exports = {
   async update(id, data) {
     try {
       const [updated] = await db('casos').where({ id }).update(data).returning('*');
-      if (!updated) {
-        const error = new Error('Caso não encontrado para atualizar');
-        error.status = 404;
-        throw error;
-      }
-      return updated;
+      return updated; // Removido o throw para deixar o controller lidar com o 404
     } catch (err) {
       throw err;
     }
@@ -62,12 +52,7 @@ module.exports = {
   async remove(id) {
     try {
       const deleted = await db('casos').where({ id }).del();
-      if (!deleted) {
-        const error = new Error('Caso não encontrado para remover');
-        error.status = 404;
-        throw error;
-      }
-      return true;
+      return deleted; // Retorna 1 se deletado, 0 se não encontrado
     } catch (err) {
       throw err;
     }

@@ -5,9 +5,9 @@ module.exports = {
     try {
       let query = db('agentes');
       if (cargo) query = query.where('cargo', cargo);
-      if (dataDeIncorporacao) query = query.where('dataDeIncorporacao', '>=', dataDeIncorporacao);
+      if (dataDeIncorporacao) query = query.where('data_de_incorporacao', '>=', dataDeIncorporacao); // Corrigido para snake_case
 
-      const validSorts = ['nome', 'dataDeIncorporacao', 'cargo'];
+      const validSorts = ['nome', 'data_de_incorporacao', 'cargo']; // Corrigido para snake_case
       if (sort) {
         const desc = sort.startsWith('-');
         const field = desc ? sort.slice(1) : sort;
@@ -23,12 +23,7 @@ module.exports = {
   async findById(id) {
     try {
       const agente = await db('agentes').where({ id }).first();
-      if (!agente) {
-        const err = new Error('Agente não encontrado.');
-        err.statusCode = 404;
-        throw err;
-      }
-      return agente;
+      return agente; // Removido o throw para deixar o controller lidar com o 404
     } catch (error) {
       throw error;
     }
@@ -36,7 +31,11 @@ module.exports = {
 
   async create(data) {
     try {
-      const [created] = await db('agentes').insert(data).returning('*');
+      const [created] = await db('agentes').insert({
+        nome: data.nome,
+        data_de_incorporacao: data.dataDeIncorporacao, // Mapeamento manual
+        cargo: data.cargo,
+      }).returning('*');
       return created;
     } catch (error) {
       throw new Error('Erro ao criar agente.');
@@ -45,13 +44,13 @@ module.exports = {
 
   async update(id, data) {
     try {
-      const [updated] = await db('agentes').where({ id }).update(data).returning('*');
-      if (!updated) {
-        const err = new Error('Agente não encontrado para atualização.');
-        err.statusCode = 404;
-        throw err;
-      }
-      return updated;
+      const dataToUpdate = {
+        ...(data.nome && { nome: data.nome }),
+        ...(data.dataDeIncorporacao && { data_de_incorporacao: data.dataDeIncorporacao }), // Mapeamento manual
+        ...(data.cargo && { cargo: data.cargo }),
+      };
+      const [updated] = await db('agentes').where({ id }).update(dataToUpdate).returning('*');
+      return updated; // Removido o throw para deixar o controller lidar com o 404
     } catch (error) {
       throw error;
     }
@@ -60,12 +59,7 @@ module.exports = {
   async remove(id) {
     try {
       const deleted = await db('agentes').where({ id }).del();
-      if (!deleted) {
-        const err = new Error('Agente não encontrado para remoção.');
-        err.statusCode = 404;
-        throw err;
-      }
-      return true;
+      return deleted; // Retorna 1 se deletado, 0 se não encontrado
     } catch (error) {
       throw error;
     }
