@@ -83,11 +83,20 @@ module.exports = {
   },
 
   async getCasosDoAgente(req, res) {
+  try {
     const { id } = req.params;
     const agente = await agentesRepository.findById(id);
-    if (!agente) return res.status(404).json({ message: 'Agente não encontrado.' });
+    
+    if (!agente) {
+      return res.status(404).json({ message: 'Agente não encontrado.' });
+    }
 
+    // CORREÇÃO: Usar o método específico para buscar casos do agente
     const casos = await casosRepository.findByAgenteId(id);
     res.json(casos);
+    
+  } catch (err) {
+    res.status(500).json({ message: 'Erro interno ao buscar casos do agente.' });
+  }
   }
 };

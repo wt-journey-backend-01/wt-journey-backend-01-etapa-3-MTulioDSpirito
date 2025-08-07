@@ -6,13 +6,13 @@ module.exports = {
       let query = db('casos');
 
       if (status) query = query.where('status', status);
-      if (agente_id) query = query.where('agente_id', agente_id);
+      if (agente_id) query = query.where('agente_id', agente_id); // Garantir filtro por agente
 
       if (q && q.trim()) {
         const search = q.toLowerCase();
         query = query.where(function () {
           this.whereRaw('LOWER(titulo) LIKE ?', [`%${search}%`])
-              .orWhereRaw('LOWER(descricao) LIKE ?', [`%${search}%`]);
+            .orWhereRaw('LOWER(descricao) LIKE ?', [`%${search}%`]);
         });
       }
 

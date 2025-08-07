@@ -1,17 +1,15 @@
 exports.seed = async function(knex) {
   await knex('casos').del();
-  await knex('casos').insert([
+  return knex('casos').insert([
     {
-      id: 1,
-      titulo: 'Roubo a banco',
-      descricao: 'Investigação em andamento.',
+      titulo: 'Caso do Diamante',
+      descricao: 'Roubo de diamante na mansão Abernathy',
       status: 'aberto',
       agente_id: 1
     },
     {
-      id: 2,
-      titulo: 'Homicídio em zona rural',
-      descricao: 'Caso resolvido com prisão do suspeito.',
+      titulo: 'Desaparecimento na Floresta',
+      descricao: 'Desaparecimento de adolescente na floresta Blackwood',
       status: 'solucionado',
       agente_id: 2
     }

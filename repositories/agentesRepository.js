@@ -5,9 +5,9 @@ module.exports = {
     try {
       let query = db('agentes');
       if (cargo) query = query.where('cargo', cargo);
-      if (dataDeIncorporacao) query = query.where('data_de_incorporacao', '>=', dataDeIncorporacao); // Corrigido para snake_case
+      if (dataDeIncorporacao) query = query.where('data_de_incorporacao', '>=', dataDeIncorporacao);
 
-      const validSorts = ['nome', 'data_de_incorporacao', 'cargo']; // Corrigido para snake_case
+      const validSorts = ['nome', 'data_de_incorporacao', 'cargo'];
       if (sort) {
         const desc = sort.startsWith('-');
         const field = desc ? sort.slice(1) : sort;
@@ -22,8 +22,7 @@ module.exports = {
 
   async findById(id) {
     try {
-      const agente = await db('agentes').where({ id }).first();
-      return agente; // Removido o throw para deixar o controller lidar com o 404
+      return await db('agentes').where({ id }).first();
     } catch (error) {
       throw error;
     }
@@ -31,32 +30,33 @@ module.exports = {
 
   async create(data) {
     try {
-      const [created] = await db('agentes').insert({
-        nome: data.nome,
-        data_de_incorporacao: data.dataDeIncorporacao, // Mapeamento manual
-        cargo: data.cargo,
-      }).returning('*');
+      const [created] = await db('agentes').insert(data).returning('*');
       return created;
     } catch (error) {
       throw new Error('Erro ao criar agente.');
     }
   },
 
-async update(id, data) {
-  const exists = await db('agentes').where({ id }).first();
-  if (!exists) return null; // Não encontrado
+  async update(id, data) {
+    try {
+      const exists = await db('agentes').where({ id }).first();
+      if (!exists) return null;
 
-  const [updated] = await db('agentes')
-    .where({ id })
-    .update(dataToUpdate)
-    .returning('*');
-  return updated;
-},
+      // CORREÇÃO: Usar o parâmetro 'data' diretamente
+      const [updated] = await db('agentes')
+        .where({ id })
+        .update(data)  // Correção aplicada aqui
+        .returning('*');
+        
+      return updated;
+    } catch (error) {
+      throw error;
+    }
+  },
 
   async remove(id) {
     try {
-      const deleted = await db('agentes').where({ id }).del();
-      return deleted; // Retorna 1 se deletado, 0 se não encontrado
+      return await db('agentes').where({ id }).del();
     } catch (error) {
       throw error;
     }
