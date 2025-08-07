@@ -19,6 +19,14 @@ const patchSchema = Joi.object({
   cargo: Joi.string()
 }).min(1);
 
+const querySchema = Joi.object({
+  cargo: Joi.string(),
+  sort: Joi.string().pattern(/^-?(nome|dataDeIncorporacao|cargo)$/),
+  dataDeIncorporacao: Joi.date().iso()
+});
+
+
+
 module.exports = {
   async getAllAgentes(req, res) {
     try {

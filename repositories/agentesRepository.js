@@ -42,19 +42,16 @@ module.exports = {
     }
   },
 
-  async update(id, data) {
-    try {
-      const dataToUpdate = {
-        ...(data.nome && { nome: data.nome }),
-        ...(data.dataDeIncorporacao && { data_de_incorporacao: data.dataDeIncorporacao }), // Mapeamento manual
-        ...(data.cargo && { cargo: data.cargo }),
-      };
-      const [updated] = await db('agentes').where({ id }).update(dataToUpdate).returning('*');
-      return updated; // Removido o throw para deixar o controller lidar com o 404
-    } catch (error) {
-      throw error;
-    }
-  },
+async update(id, data) {
+  const exists = await db('agentes').where({ id }).first();
+  if (!exists) return null; // Não encontrado
+
+  const [updated] = await db('agentes')
+    .where({ id })
+    .update(dataToUpdate)
+    .returning('*');
+  return updated;
+},
 
   async remove(id) {
     try {

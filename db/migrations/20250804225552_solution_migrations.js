@@ -29,6 +29,3 @@ exports.down = function(knex) {
     .dropTableIfExists('agentes');
   
 };
-
-
-
