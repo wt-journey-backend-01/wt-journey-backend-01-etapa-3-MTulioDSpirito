@@ -3,6 +3,7 @@ exports.up = async function (knex) {
     table.increments('id').primary();
     table.string('titulo').notNullable();
     table.text('descricao').notNullable();
+    // Ajustado para usar os valores 'aberto' e 'solucionado' para consistência
     table.enu('status', ['aberto', 'solucionado']).notNullable();
     table
       .integer('agente_id')
