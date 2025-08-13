@@ -1,6 +1,7 @@
 const agentesRepository = require('../repositories/agentesRepository');
 const casosRepository = require('../repositories/casosRepository');
 const Joi = require('joi');
+const { AppError } = require('../utils/errorHandler');
 
 const agenteSchema = Joi.object({
   nome: Joi.string().min(3).max(50).required(),

@@ -1,6 +1,7 @@
 const casosRepository = require('../repositories/casosRepository');
 const agentesRepository = require('../repositories/agentesRepository');
 const Joi = require('joi');
+const { AppError } = require('../utils/errorHandler');
 
 const casoSchema = Joi.object({
   titulo: Joi.string().required(),

@@ -1,12 +1,24 @@
-// utils/errorHandler.js
-
-function errorHandler(err, req, res, next) {
-  console.error(err);
-
-  const status = err.status || 500;
-  const message = err.message || 'Erro interno do servidor.';
-
-  res.status(status).json({ message });
+class AppError extends Error {
+    constructor(statusCode, message, errors = []) {
+        super(message);
+        this.statusCode = statusCode;
+        this.errors = errors.map((err) => err.msg || err);
+    }
 }
 
-module.exports = errorHandler;
+const errorHandler = (err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Erro interno no servidor';
+    const errors = err.errors || [];
+
+    res.status(statusCode).json({
+        status: statusCode,
+        message,
+        errors,
+    });
+};
+
+module.exports = {
+    errorHandler,
+    AppError,
+};
