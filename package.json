@@ -1,30 +1,29 @@
 {
   "name": "wt-journey-backend-01-etapa-3-mtuliodspirito",
   "version": "1.0.0",
-  "description": "API do backend para o projeto WT Journey - Etapa 3",
+  "description": "API REST para gerenciamento de agentes e casos da polícia",
   "main": "server.js",
-  "scripts": {
-    "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "format": "prettier --write ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "joi": "^18.0.0",
     "knex": "^3.1.0",
-    "lodash": "^4.17.21",
     "pg": "^8.16.3",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "uuid": "^11.1.0",
+    "zod": "^4.0.17"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.10",
-    "prettier": "^3.6.2"
-  }
+  "scripts": {
+    "start": "node --watch server.js",
+    "format": "prettier --write ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mtuliodspirito/wt-journey-backend-01-etapa-3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "homepage": ""
 }

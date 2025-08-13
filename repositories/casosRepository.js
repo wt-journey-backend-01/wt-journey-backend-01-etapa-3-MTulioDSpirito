@@ -1,68 +1,64 @@
 const db = require('../db/db');
+const { AppError } = require('../utils/errorHandler');
 
-module.exports = {
-  async findAll({ status, agente_id, q }) {
+async function findAll() {
     try {
-      let query = db('casos');
-
-      if (status) query = query.where('status', status);
-      if (agente_id) query = query.where('agente_id', agente_id); // Garantir filtro por agente
-
-      if (q && q.trim()) {
-        const search = q.toLowerCase();
-        query = query.where(function () {
-          this.whereRaw('LOWER(titulo) LIKE ?', [`%${search}%`])
-            .orWhereRaw('LOWER(descricao) LIKE ?', [`%${search}%`]);
-        });
-      }
-
-      return await query;
-    } catch (err) {
-      throw new Error('Erro ao buscar casos: ' + err.message);
+        // Busca todos os casos ordenados por ID
+        return await db('casos').select('*').orderBy('id', 'asc');
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar casos', [error.message]);
     }
-  },
+}
 
-  async findById(id) {
+async function findById(id) {
     try {
-      const caso = await db('casos').where({ id }).first();
-      return caso; // Removido o throw para deixar o controller lidar com o 404
-    } catch (err) {
-      throw err;
+        // Busca um caso específico pelo ID
+        return await db('casos').where({ id }).first();
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar caso', [error.message]);
     }
-  },
+}
 
-  async create(data) {
+async function create(data) {
     try {
-      const [created] = await db('casos').insert(data).returning('*');
-      return created;
-    } catch (err) {
-      throw new Error('Erro ao criar caso: ' + err.message);
+        // Mapeia os dados do objeto JavaScript (camelCase) para o formato do banco (snake_case)
+        const dataToInsert = {
+            titulo: data.titulo,
+            descricao: data.descricao,
+            status: data.status,
+            agente_id: data.agenteId, // Mapeamento de agenteId para agente_id
+        };
+        const [caso] = await db('casos').insert(dataToInsert).returning('*');
+        return caso;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao criar caso', [error.message]);
     }
-  },
+}
 
-  async update(id, data) {
+async function update(id, data) {
     try {
-      const [updated] = await db('casos').where({ id }).update(data).returning('*');
-      return updated; // Removido o throw para deixar o controller lidar com o 404
-    } catch (err) {
-      throw err;
-    }
-  },
+        // Mapeia os dados do objeto JavaScript (camelCase) para o formato do banco (snake_case) para atualização
+        const dataToUpdate = {};
+        if (data.titulo !== undefined) dataToUpdate.titulo = data.titulo;
+        if (data.descricao !== undefined) dataToUpdate.descricao = data.descricao;
+        if (data.status !== undefined) dataToUpdate.status = data.status;
+        if (data.agenteId !== undefined) dataToUpdate.agente_id = data.agenteId; // Mapeamento para agente_id
 
-  async remove(id) {
-    try {
-      const deleted = await db('casos').where({ id }).del();
-      return deleted; // Retorna 1 se deletado, 0 se não encontrado
-    } catch (err) {
-      throw err;
+        const [caso] = await db('casos').update(dataToUpdate).where({ id }).returning('*');
+        return caso || null; // Retorna o caso atualizado ou null se não encontrado
+    } catch (error) {
+        throw new AppError(500, 'Erro ao atualizar caso', [error.message]);
     }
-  },
+}
 
-  async findByAgenteId(agenteId) {
+async function remove(id) {
     try {
-      return await db('casos').where({ agente_id: agenteId });
-    } catch (err) {
-      throw new Error('Erro ao buscar casos por agente: ' + err.message);
+        // Remove um caso pelo ID
+        const deleted = await db('casos').where({ id }).del();
+        return deleted > 0; // Retorna true se algo foi deletado, false caso contrário
+    } catch (error) {
+        throw new AppError(500, 'Erro ao deletar caso', [error.message]);
     }
-  }
-};
+}
+
+module.exports = { findAll, findById, create, update, remove };

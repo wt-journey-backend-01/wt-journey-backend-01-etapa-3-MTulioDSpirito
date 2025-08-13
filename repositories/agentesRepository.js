@@ -1,64 +1,65 @@
 const db = require('../db/db');
+const { AppError } = require('../utils/errorHandler');
 
-module.exports = {
-  async findAll({ cargo, sort, dataDeIncorporacao }) {
+async function findAll() {
     try {
-      let query = db('agentes');
-      if (cargo) query = query.where('cargo', cargo);
-      if (dataDeIncorporacao) query = query.where('data_de_incorporacao', '>=', dataDeIncorporacao);
-
-      const validSorts = ['nome', 'data_de_incorporacao', 'cargo'];
-      if (sort) {
-        const desc = sort.startsWith('-');
-        const field = desc ? sort.slice(1) : sort;
-        if (validSorts.includes(field)) query = query.orderBy(field, desc ? 'desc' : 'asc');
-      }
-
-      return await query;
+        // Selecionando todas as colunas e ordenando por id.
+        // As colunas serão convertidas de snake_case (banco) para camelCase (JS)
+        // se o postProcessResponse estiver ativado no db.js.
+        return await db('agentes').select('*').orderBy('id', 'asc');
     } catch (error) {
-      throw new Error('Erro ao buscar agentes.');
+        throw new AppError(500, 'Erro ao buscar agentes', [error.message]);
     }
-  },
+}
 
-  async findById(id) {
+async function findById(id) {
     try {
-      return await db('agentes').where({ id }).first();
+        // A conversão de nome de coluna de `id` não é necessária aqui, pois é um nome simples.
+        // O `first()` retorna apenas um registro.
+        return await db('agentes').where({ id }).first();
     } catch (error) {
-      throw error;
+        throw new AppError(500, 'Erro ao buscar agente', [error.message]);
     }
-  },
+}
 
-  async create(data) {
+async function create(data) {
     try {
-      const [created] = await db('agentes').insert(data).returning('*');
-      return created;
+        // Mapeando dados do camelCase (JS) para snake_case (banco)
+        // Isso é necessário porque removemos a conversão automática no db.js
+        const dataToInsert = {
+            nome: data.nome,
+            data_de_incorporacao: data.dataDeIncorporacao, // Convertendo para snake_case
+            cargo: data.cargo,
+        };
+        const [agente] = await db('agentes').insert(dataToInsert).returning('*');
+        return agente;
     } catch (error) {
-      throw new Error('Erro ao criar agente.');
+        throw new AppError(500, 'Erro ao criar agente', [error.message]);
     }
-  },
+}
 
-  async update(id, data) {
+async function update(id, data) {
     try {
-      const exists = await db('agentes').where({ id }).first();
-      if (!exists) return null;
+        // Mapeando dados do camelCase (JS) para snake_case (banco) para atualização
+        const dataToUpdate = {};
+        if (data.nome !== undefined) dataToUpdate.nome = data.nome;
+        if (data.dataDeIncorporacao !== undefined) dataToUpdate.data_de_incorporacao = data.dataDeIncorporacao; // Convertendo
+        if (data.cargo !== undefined) dataToUpdate.cargo = data.cargo;
 
-      // CORREÇÃO: Usar o parâmetro 'data' diretamente
-      const [updated] = await db('agentes')
-        .where({ id })
-        .update(data)  // Correção aplicada aqui
-        .returning('*');
-        
-      return updated;
+        const [agente] = await db('agentes').update(dataToUpdate).where({ id }).returning('*');
+        return agente || null; // Retorna o agente atualizado ou null se não encontrado
     } catch (error) {
-      throw error;
+        throw new AppError(500, 'Erro ao atualizar agente', [error.message]);
     }
-  },
+}
 
-  async remove(id) {
+async function remove(id) {
     try {
-      return await db('agentes').where({ id }).del();
+        const deleted = await db('agentes').where({ id }).del();
+        return deleted > 0; // Retorna true se algo foi deletado, false caso contrário
     } catch (error) {
-      throw error;
+        throw new AppError(500, 'Erro ao deletar agente', [error.message]);
     }
-  }
-};
+}
+
+module.exports = { findAll, findById, create, update, remove };

@@ -1,9 +1,5 @@
-require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./docs/swagger.js');
-
+const cors = require('cors'); // Adicionando cors de volta, pois é comum para APIs
 const agentesRoutes = require('./routes/agentesRoutes');
 const casosRoutes = require('./routes/casosRoutes');
 const { errorHandler } = require('./utils/errorHandler');
@@ -11,19 +7,14 @@ const { errorHandler } = require('./utils/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
-app.use(cors());
 app.use(express.json());
+app.use(cors()); // Usando cors para permitir requisições de outras origens
 
-// Rotas
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/agentes', agentesRoutes);
 app.use('/casos', casosRoutes);
 
-// Middleware de tratamento de erros
 app.use(errorHandler);
 
-// Inicialização do servidor
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Servidor da Delegacia rodando em http://localhost:${PORT}`);
 });
