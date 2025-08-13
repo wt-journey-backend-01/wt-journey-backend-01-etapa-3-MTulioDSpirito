@@ -37,7 +37,6 @@ const agentesController = require('../controllers/agentesController');
  *               items:
  *                 $ref: '#/components/schemas/Agente'
  */
-
 router.get('/', agentesController.getAllAgentes);
 
 /**
@@ -75,15 +74,14 @@ router.post('/', agentesController.createAgente);
  *   get:
  *     summary: Retorna um agente específico
  *     tags: [Agentes]
- *     description: Busca e retorna os dados de um agente pelo seu ID (UUID).
+ *     description: Busca e retorna os dados de um agente pelo seu ID.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
- *         description: ID (UUID) do agente.
+ *           type: integer
+ *         description: ID numérico do agente.
  *     responses:
  *       200:
  *         description: Detalhes do agente.
@@ -108,9 +106,8 @@ router.get('/:id', agentesController.getAgenteById);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
- *         description: ID (UUID) do agente a ser atualizado.
+ *           type: integer
+ *         description: ID numérico do agente a ser atualizado.
  *     requestBody:
  *       required: true
  *       content:
@@ -141,9 +138,8 @@ router.put('/:id', agentesController.putAgente);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
- *         description: ID (UUID) do agente a ser atualizado.
+ *           type: integer
+ *         description: ID numérico do agente a ser atualizado.
  *     requestBody:
  *       required: true
  *       content:
@@ -176,15 +172,14 @@ router.patch('/:id', agentesController.patchAgente);
  *   delete:
  *     summary: Remove um agente
  *     tags: [Agentes]
- *     description: Remove um agente do sistema pelo seu ID (UUID).
+ *     description: Remove um agente do sistema pelo seu ID.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: string
- *           format: uuid
- *         description: ID (UUID) do agente a ser removido.
+ *           type: integer
+ *         description: ID numérico do agente a ser removido.
  *     responses:
  *       204:
  *         description: Agente removido com sucesso (sem conteúdo de resposta).

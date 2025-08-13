@@ -30,9 +30,9 @@ const options = {
           type: 'object',
           properties: {
             id: {
-              type: 'string',
-              format: 'uuid',
-              description: 'ID único do agente.',
+              type: 'integer',
+              description: 'ID único do agente (auto incremento).',
+              example: 1,
             },
             nome: {
               type: 'string',
@@ -72,9 +72,9 @@ const options = {
           type: 'object',
           properties: {
             id: {
-              type: 'string',
-              format: 'uuid',
-              description: 'ID único do caso.',
+              type: 'integer',
+              description: 'ID único do caso (auto incremento).',
+              example: 1,
             },
             titulo: {
               type: 'string',
@@ -87,9 +87,9 @@ const options = {
               enum: ['aberto', 'em andamento', 'solucionado'],
             },
             agente_id: {
-              type: 'string',
-              format: 'uuid',
+              type: 'integer',
               description: 'ID do agente responsável.',
+              example: 1,
             },
           },
         },
@@ -111,9 +111,8 @@ const options = {
               example: 'aberto',
             },
             agente_id: {
-              type: 'string',
-              format: 'uuid',
-              example: 'c4a3b2e1-d5f6-4a7b-8c9d-0e1f2a3b4c5d',
+              type: 'integer',
+              example: 1,
             },
           },
         },

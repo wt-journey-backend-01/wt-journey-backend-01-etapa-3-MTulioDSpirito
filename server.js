@@ -6,7 +6,7 @@ const swaggerSpecs = require('./docs/swagger.js');
 
 const agentesRoutes = require('./routes/agentesRoutes');
 const casosRoutes = require('./routes/casosRoutes');
-const { AppError } = require('./utils/errorHandler');
+const { errorHandler } = require('./utils/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +21,7 @@ app.use('/agentes', agentesRoutes);
 app.use('/casos', casosRoutes);
 
 // Middleware de tratamento de erros
-app.use(AppError);
+app.use(errorHandler);
 
 // Inicialização do servidor
 app.listen(PORT, () => {

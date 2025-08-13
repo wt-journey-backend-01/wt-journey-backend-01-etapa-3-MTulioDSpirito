@@ -1,6 +1,6 @@
+const Joi = require('joi');
 const agentesRepository = require('../repositories/agentesRepository');
 const casosRepository = require('../repositories/casosRepository');
-const Joi = require('joi');
 const { AppError } = require('../utils/errorHandler');
 
 const agenteSchema = Joi.object({
@@ -26,78 +26,91 @@ const querySchema = Joi.object({
   dataDeIncorporacao: Joi.date().iso()
 });
 
-
-
 module.exports = {
-  async getAllAgentes(req, res) {
+  async getAllAgentes(req, res, next) {
     try {
       const { cargo, sort, dataDeIncorporacao } = req.query;
       const agentes = await agentesRepository.findAll({ cargo, sort, dataDeIncorporacao });
       res.json(agentes);
     } catch (err) {
-      res.status(500).json({ message: 'Erro interno ao buscar agentes.' });
+      next(new AppError(500, 'Erro interno ao buscar agentes'));
     }
   },
 
-  async getAgenteById(req, res) {
-    const { id } = req.params;
-    const agente = await agentesRepository.findById(id);
-    if (!agente) return res.status(404).json({ message: 'Agente não encontrado.' });
-    res.json(agente);
-  },
-
-  async createAgente(req, res) {
-    const { error, value } = agenteSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message }); // Mensagem de erro mais específica
-
-    const novoAgente = await agentesRepository.create(value);
-    res.status(201).json(novoAgente);
-  },
-
-  // Novo método para PUT (atualização completa)
-  async putAgente(req, res) {
-    const { id } = req.params;
-    const { error, value } = agenteSchema.validate(req.body); // Validação de todos os campos
-    if (error) return res.status(400).json({ message: error.details[0].message });
-
-    const updated = await agentesRepository.update(id, value);
-    if (!updated) return res.status(404).json({ message: 'Agente não encontrado.' });
-
-    res.json(updated);
-  },
-
-  async patchAgente(req, res) {
-    const { id } = req.params;
-    const { error, value } = patchSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
-
-    const updated = await agentesRepository.update(id, value);
-    if (!updated) return res.status(404).json({ message: 'Agente não encontrado.' });
-
-    res.json(updated);
-  },
-
-  async deleteAgente(req, res) {
-    const deleted = await agentesRepository.remove(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Agente não encontrado.' });
-    res.status(204).send();
-  },
-
-  async getCasosDoAgente(req, res) {
-  try {
-    const { id } = req.params;
-    const agente = await agentesRepository.findById(id);
-    
-    if (!agente) {
-      return res.status(404).json({ message: 'Agente não encontrado.' });
+  async getAgenteById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const agente = await agentesRepository.findById(id);
+      if (!agente) throw new AppError(404, 'Agente não encontrado');
+      res.json(agente);
+    } catch (err) {
+      next(err);
     }
+  },
 
-    // CORREÇÃO: Usar o método específico para buscar casos do agente
-    const casos = await casosRepository.findByAgenteId(id);
-    res.json(casos);
-    
-  } catch (err) {
-    res.status(500).json({ message: 'Erro interno ao buscar casos do agente.' });
-  }
+  async createAgente(req, res, next) {
+    try {
+      const { error, value } = agenteSchema.validate(req.body);
+      if (error) throw new AppError(400, error.details[0].message);
+
+      const novoAgente = await agentesRepository.create(value);
+      res.status(201).json(novoAgente);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async putAgente(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { error, value } = agenteSchema.validate(req.body);
+      if (error) throw new AppError(400, error.details[0].message);
+
+      const updated = await agentesRepository.update(id, value);
+      if (!updated) throw new AppError(404, 'Agente não encontrado');
+
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async patchAgente(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { error, value } = patchSchema.validate(req.body);
+      if (error) throw new AppError(400, error.details[0].message);
+
+      const updated = await agentesRepository.update(id, value);
+      if (!updated) throw new AppError(404, 'Agente não encontrado');
+
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async deleteAgente(req, res, next) {
+    try {
+      const deleted = await agentesRepository.remove(req.params.id);
+      if (!deleted) throw new AppError(404, 'Agente não encontrado');
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getCasosDoAgente(req, res, next) {
+    try {
+      const { id } = req.params;
+      const agente = await agentesRepository.findById(id);
+
+      if (!agente) throw new AppError(404, 'Agente não encontrado');
+
+      const casos = await casosRepository.findByAgenteId(id);
+      res.json(casos);
+    } catch (err) {
+      next(err);
+    }
   }
 };
